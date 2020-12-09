@@ -34,8 +34,6 @@ reader.addEventListener('load', () => {
     })
 })
 
-
-
 const initCanvas = (id) => {
     return new fabric.Canvas(id, {
         width: 500,
@@ -53,6 +51,75 @@ const setBackground = (url, canvas) => {
 
 const canvas = initCanvas('canvas')
 const canvasTest = initCanvas('canvasTest')
+
+
+
+
+
+//Undo redo
+// current unsaved state
+var stateCanvasTest;
+// past states
+var undo = [];
+// reverted states
+var redo = [];
+
+/**
+ * Push the current state into the undo stack and then capture the current state
+ */
+function save() {
+    // clear the redo stack
+    redo = [];
+    $('#redo').prop('disabled', true);
+    // initial call won't have a state
+    if (stateCanvasTest) {
+        undo.push(stateCanvasTest);
+        $('#undo').prop('disabled', false);
+    }
+    stateCanvasTest = canvasTest.toJSON()
+    console.log(stateCanvasTest);
+}
+
+/**
+    * Save the current state in the redo stack, reset to a state in the undo stack, and enable the buttons accordingly.
+    * Or, do the opposite (redo vs. undo)
+    * @param playStack which stack to get the last state from and to then render the canvas as
+    * @param saveStack which stack to push current state into
+    * @param buttonsOn jQuery selector. Enable these buttons.
+    * @param buttonsOff jQuery selector. Disable these buttons.
+    */
+function replay(playStack, saveStack, buttonsOn, buttonsOff) {
+    saveStack.push(stateCanvasTest);
+    stateCanvasTest = playStack.pop();
+    var on = $(buttonsOn);
+    var off = $(buttonsOff);
+    // turn both buttons off for the moment to prevent rapid clicking
+    on.prop('disabled', true);
+    off.prop('disabled', true);
+    canvasTest.clear();
+    canvasTest.loadFromJSON(stateCanvasTest, function () {
+        canvasTest.renderAll();
+        // now turn the buttons back on if applicable
+        on.prop('disabled', false);
+        if (playStack.length) {
+            off.prop('disabled', false);
+        }
+    });
+}
+
+save();
+// register event listener for user's actions
+canvasTest.on('object:modified', function () {
+    save();
+});
+// undo and redo buttonsS
+$('#undo').click(function () {
+    replay(undo, redo, '#redo', this);
+});
+$('#redo').click(function () {
+    replay(redo, undo, '#undo', this);
+})
+
 
 setBackground(bgUrl, canvas)
 setBackground(testUrl, canvasTest)
@@ -94,19 +161,22 @@ const clearCanvas = (canvas, state) => {
 }
 const testClick = (canvas) => {
     var svg = canvas.toSVG()
-    console.log('SVG: ' + svg);
+    // console.log('SVG: ' + svg);
 
     var json = canvas.toJSON();
-    console.log(json);
+    // console.log(json);
     // canvas.getObjects().forEach((obj) => {
     //     if (obj !== canvas.backgroundImage) {
     //         canvas.remove(obj)
     //     }
     // })
-    delete json["backgroundImage"];
+    // delete json["backgroundImage"];
+    stateCanvasTest = json
     canvasTest.loadFromJSON(json, function () {
-        canvas.renderAll();
+        canvasTest.renderAll();
     });
+
+    save()
 }
 
 createRect = (canvas) => {
@@ -164,7 +234,6 @@ createCirc = () => {
         }
     });
 }
-
 
 const groupObjects = (canvas, group, shouldGroup) => {
     if (shouldGroup) {
@@ -250,3 +319,8 @@ const setPanEvents = (canvas) => {
 
 setPanEvents(canvas)
 setColorListener()
+
+
+
+
+
