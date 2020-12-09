@@ -12,7 +12,9 @@ let group = {}
 
 
 const bgUrl = 'https://cdn.pixabay.com/photo/2019/07/13/10/49/music-4334557_960_720.jpg'
+const testUrl = 'https://cdn.pixabay.com/photo/2020/11/12/15/45/dog-5735837_960_720.jpg'
 let svgState = {}
+
 
 const inputFile = document.getElementById('myImage')
 
@@ -50,8 +52,15 @@ const setBackground = (url, canvas) => {
 }
 
 const canvas = initCanvas('canvas')
+const canvasTest = initCanvas('canvasTest')
 
 setBackground(bgUrl, canvas)
+setBackground(testUrl, canvasTest)
+
+const zoom = (canvasTest) => {
+    let zo = canvasTest.getZoom()
+    canvasTest.setZoom(zo + 0.2)
+}
 
 const restoreCanvas = (canvas, state, bgUrl) => {
     if (state.val) {
@@ -81,6 +90,23 @@ const clearCanvas = (canvas, state) => {
             canvas.remove(obj)
         }
     })
+
+}
+const testClick = (canvas) => {
+    var svg = canvas.toSVG()
+    console.log('SVG: ' + svg);
+
+    var json = canvas.toJSON();
+    console.log(json);
+    // canvas.getObjects().forEach((obj) => {
+    //     if (obj !== canvas.backgroundImage) {
+    //         canvas.remove(obj)
+    //     }
+    // })
+    delete json["backgroundImage"];
+    canvasTest.loadFromJSON(json, function () {
+        canvas.renderAll();
+    });
 }
 
 createRect = (canvas) => {

@@ -10,30 +10,42 @@
 </head>
 
 <body>
-    <button onclick="toggleMode(modes.pan)">Toggle Pan</button>
-    <button onclick="toggleMode(modes.draw)">Toggle Drawing</button>
-    <input id="colorPicker" value="#ffff" data-jscolor="">
-    <button onclick="clearCanvas(canvas,svgState)">Clear</button>
-    <button onclick="restoreCanvas(canvas,svgState,bgUrl)">Restore</button>
+    <div style="float: left;">
+        <button onclick="toggleMode(modes.pan)">Toggle Pan</button>
+        <button onclick="toggleMode(modes.draw)">Toggle Drawing</button>
+        <input id="colorPicker" value="#ffff" data-jscolor="">
+        <button onclick="clearCanvas(canvas,svgState)">Clear</button>
+        <button onclick="restoreCanvas(canvas,svgState,bgUrl)">Restore</button>
+        <button onclick="testClick(canvas)">Test</button>
+        <button onclick="zoom(canvasTest)">Zoom</button>
 
-    <canvas id="canvas"></canvas>
+        <canvas id="canvas"></canvas>
 
-    <div id="bottomButtons">
-        <div id="objectButtonsWrapper">
-            <p id="objectsTitle">Object</p>
-            <div id="objectButtons">
-                <button onclick="createRect(canvas)">Rect</button>
-                <button onclick="createCirc(canvas)">Circ</button>
-                <button onclick="groupObjects(canvas,group,true)">Group</button>
-                <button onclick="groupObjects(canvas,group,false)">Ungroup</button>
+        <div id="bottomButtons">
+            <div id="objectButtonsWrapper">
+                <p id="objectsTitle">Object</p>
+                <div id="objectButtons">
+                    <button onclick="createRect(canvas)">Rect</button>
+                    <button onclick="createCirc(canvas)">Circ</button>
+                    <button onclick="groupObjects(canvas,group,true)">Group</button>
+                    <button onclick="groupObjects(canvas,group,false)">Ungroup</button>
+                </div>
+            </div>
+
+            <div class="buttonWrapper">
+                <p class="buttonTitles">Image</p>
+                <input id="myImage" type="file" accept="image/*">
             </div>
         </div>
 
-        <div class="buttonWrapper">
-            <p class="buttonTitles">Image</p>
-            <input id="myImage" type="file" accept="image/*">
-        </div>
+
     </div>
+    <div style="float: right;">
+        <canvas id="canvasTest"></canvas>
+    </div>
+
+
+
 
     <script src="./lib/fabric.min.js"></script>
     <script src="./lib/jscolor.js"></script>
