@@ -9,7 +9,7 @@ const modes = {
 
 let color = "#000000"
 let group = {}
-
+let FabricBorder = {}
 
 const bgUrl = 'https://cdn.pixabay.com/photo/2019/07/13/10/49/music-4334557_960_720.jpg'
 const testUrl = 'https://cdn.pixabay.com/photo/2020/11/12/15/45/dog-5735837_960_720.jpg'
@@ -36,8 +36,8 @@ reader.addEventListener('load', () => {
 
 const initCanvas = (id) => {
     return new fabric.Canvas(id, {
-        width: 500,
-        height: 500,
+        width: 600,
+        height: 600,
         selection: false
     })
 }
@@ -52,8 +52,70 @@ const setBackground = (url, canvas) => {
 const canvas = initCanvas('canvas')
 const canvasTest = initCanvas('canvasTest')
 
+const checkObj = (canvas) => {
+    let obj = canvas.getObjects()
+    console.log(obj);
+}
 
+const addBorder = (canvas) => {
+    const center = canvas.getCenter()
+    const w = 300
+    const h = 400
+    let border = new fabric.Rect({
+        width: w,
+        height: h,
+        top: center.top - h / 2,
+        left: center.left - w / 2,
+        strokeWidth: 1,
+        stroke: '#2403fc',
+        fill: '#ecebf0',
+        hasRotatingPoint: false,
+        lockRotation: true
+    });
+    // border.setCoords();
+    border.set({
+        'excludeFromExport': true,
+        'selectable': false,
+        'hoverCursor': 'pointer',
+        id: 'border'
+    })
+    FabricBorder = border
+    canvas.add(border);
 
+    canvas.renderAll();
+}
+
+const addSticker = (canvas) => {
+
+    let obj = canvas.getObjects()
+    let border = obj.find(o => o.id === 'border')
+    if (!border) {
+        return
+    }
+    let centerBorder = border.getCenterPoint()
+
+    fabric.loadSVGFromURL('http://fabricjs.com/assets/1.svg', (objects, options) => {
+
+        let loadedObject = fabric.util.groupSVGElements(objects, options);
+
+        const center = canvas.getCenter()
+        loadedObject.set({
+            'left': centerBorder.x,
+            'top': centerBorder.y,
+            'originX': 'center',
+            'originY': 'center',
+            'typeSVG': 'sticker',
+            id: 'sticker'
+        });
+        canvas.add(loadedObject);
+
+        canvas.renderAll();
+    })
+}
+
+const testfunc = (canvas) => {
+    console.log(canvas.size());
+}
 
 
 //Undo redo
@@ -77,7 +139,6 @@ function save() {
         $('#undo').prop('disabled', false);
     }
     stateCanvasTest = canvasTest.toJSON()
-    console.log(stateCanvasTest);
 }
 
 /**
@@ -120,13 +181,30 @@ $('#redo').click(function () {
     replay(redo, undo, '#undo', this);
 })
 
-
 setBackground(bgUrl, canvas)
 setBackground(testUrl, canvasTest)
 
-const zoom = (canvasTest) => {
+const zoomIn = (canvasTest) => {
+    //way 1 not center of screen
+    // let zo = canvasTest.getZoom()
+    // canvasTest.setZoom(zo + 0.2)
+
+    //way 2
     let zo = canvasTest.getZoom()
-    canvasTest.setZoom(zo + 0.2)
+    const center = canvasTest.getCenter()
+    let centerPoint = new fabric.Point(center.top, center.left)
+    canvasTest.zoomToPoint(centerPoint, zo + 0.2)
+}
+const zoomOut = (canvasTest) => {
+    //way 1 not center of screen
+    // let zo = canvasTest.getZoom()
+    // canvasTest.setZoom(zo + 0.2)
+
+    //way 2
+    let zo = canvasTest.getZoom()
+    const center = canvasTest.getCenter()
+    let centerPoint = new fabric.Point(center.top, center.left)
+    canvasTest.zoomToPoint(centerPoint, zo - 0.2)
 }
 
 const restoreCanvas = (canvas, state, bgUrl) => {
@@ -322,5 +400,99 @@ setColorListener()
 
 
 
+
+
+
+
+//ClipTo excample
+
+var logoURL = 'https://www.google.com/images/srpr/logo4w.png';
+
+var canvas1 = new fabric.Canvas('c', {
+    width: 600,
+    height: 600,
+    selection: false
+});
+
+var clipRect2 = new fabric.Rect({
+    originX: 'left',
+    originY: 'top',
+    left: 10,
+    top: 10,
+    width: 150,
+    height: 150,
+    fill: '#DDD', /* use transparent for no fill */
+    strokeWidth: 0,
+    selectable: false
+});
+
+clipRect2.set({
+    clipFor: 'test'
+});
+canvas1.add(clipRect2);
+
+
+var logoImg = new Image();
+logoImg.src = logoURL;
+logoImg.onload = function (img) {
+    var logo = new fabric.Image(logoImg, {
+        angle: 0,
+        width: 550,
+        height: 190,
+        left: 50,
+        top: 50,
+        scaleX: 0.25,
+        scaleY: 0.25,
+        clipName: 'test',
+        clipTo: function (ctx) {
+            return _.bind(clipByName, logo)(ctx)
+        }
+    });
+    canvas1.add(logo);
+};
+
+
+
+function findByClipName(name) {
+    return _(canvas.getObjects()).where({
+        clipFor: name
+    }).first()
+}
+
+
+// Since the `angle` property of the Image object is stored 
+// in degrees, we'll use this to convert it to radians.
+function degToRad(degrees) {
+    return degrees * (Math.PI / 180);
+}
+
+
+
+var clipByName = function (ctx) {
+    this.setCoords();
+    var clipRect = findByClipName(this.clipName);
+    var scaleXTo1 = (1 / this.scaleX);
+    var scaleYTo1 = (1 / this.scaleY);
+    ctx.save();
+
+    var ctxLeft = -(this.width / 2) + clipRect.strokeWidth;
+    var ctxTop = -(this.height / 2) + clipRect.strokeWidth;
+    var ctxWidth = clipRect.width - clipRect.strokeWidth;
+    var ctxHeight = clipRect.height - clipRect.strokeWidth;
+
+    ctx.translate(ctxLeft, ctxTop);
+
+    ctx.rotate(degToRad(this.angle * -1));
+    ctx.scale(scaleXTo1, scaleYTo1);
+    ctx.beginPath();
+    ctx.rect(
+        clipRect.left - this.oCoords.tl.x,
+        clipRect.top - this.oCoords.tl.y,
+        clipRect.width,
+        clipRect.height
+    );
+    ctx.closePath();
+    ctx.restore();
+}
 
 

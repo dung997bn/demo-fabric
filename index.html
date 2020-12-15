@@ -11,15 +11,38 @@
 
 <body>
     <div style="float: left;">
-        <button onclick="toggleMode(modes.pan)">Toggle Pan</button>
-        <button onclick="toggleMode(modes.draw)">Toggle Drawing</button>
-        <input id="colorPicker" value="#ffff" data-jscolor="">
-        <button onclick="clearCanvas(canvas,svgState)">Clear</button>
-        <button onclick="restoreCanvas(canvas,svgState,bgUrl)">Restore</button>
-        <button onclick="testClick(canvas)">Test</button>
-        <button onclick="zoom(canvasTest)">Zoom</button>
+        <div>
+            <button onclick="toggleMode(modes.pan)">Toggle Pan</button>
+            <button onclick="toggleMode(modes.draw)">Toggle Drawing</button>
+            <input id="colorPicker" value="#ffff" data-jscolor="">
+            <button onclick="clearCanvas(canvas,svgState)">Clear</button>
+            <button onclick="restoreCanvas(canvas,svgState,bgUrl)">Restore</button>
+            <button onclick="testClick(canvas)">Test</button>
+        </div>
+        <hr />
+        <div>
+            <button onclick="zoomIn(canvasTest)">Zoom in</button>
+            <button onclick="zoomOut(canvasTest)">Zoom out</button>
+            <button onclick="addBorder(canvas)">Add Border</button>
+            <button onclick="addSticker(canvas)">Add Sticker</button>
+            <button onclick="checkObj(canvas)">Check Object</button>
+            <button onclick="testfunc(canvas)">Test func</button>
+        </div>
 
-        <canvas id="canvas"></canvas>
+        <div style="display: flex;">
+            <div>
+                <canvas id="canvas"></canvas>
+            </div>
+            <div>
+                <canvas id="canvasTest"></canvas>
+            </div>
+
+            <div>
+                <canvas id="c"></canvas>
+            </div>
+
+        </div>
+
 
         <div id="bottomButtons">
             <div id="objectButtonsWrapper">
@@ -42,9 +65,7 @@
 
 
     </div>
-    <div style="float: right;">
-        <canvas id="canvasTest"></canvas>
-    </div>
+
 
 
 
