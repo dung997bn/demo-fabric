@@ -414,13 +414,30 @@ var canvas1 = new fabric.Canvas('c', {
     selection: false
 });
 
+var logoImg = new Image();
+logoImg.src = logoURL;
+logoImg.onload = function (img) {
+    var logo = new fabric.Image(logoImg, {
+        angle: 0,
+        width: 550,
+        height: 190,
+        left: 150,
+        top: 150,
+        scaleX: 0.25,
+        scaleY: 0.25,
+        clipName: 'test',
+
+    });
+    canvas1.add(logo);
+};
+
 var clipRect2 = new fabric.Rect({
     originX: 'left',
     originY: 'top',
-    left: 10,
-    top: 10,
-    width: 150,
-    height: 150,
+    left: 70,
+    top: 70,
+    width: 250,
+    height: 250,
     fill: '#DDD', /* use transparent for no fill */
     strokeWidth: 0,
     selectable: false
@@ -430,69 +447,16 @@ clipRect2.set({
     clipFor: 'test'
 });
 canvas1.add(clipRect2);
+// canvas1.clipTo = function (ctx) {
+//     clipRect2.render(ctx);
+// };
+canvas1.clipPath = new fabric.Rect({
+    left: 70,
+    top: 70,
+    width: 250,
+    height: 250,
+    // originX: 'center',
+    // originY: 'center',
+}),
 
-
-var logoImg = new Image();
-logoImg.src = logoURL;
-logoImg.onload = function (img) {
-    var logo = new fabric.Image(logoImg, {
-        angle: 0,
-        width: 550,
-        height: 190,
-        left: 50,
-        top: 50,
-        scaleX: 0.25,
-        scaleY: 0.25,
-        clipName: 'test',
-        clipTo: function (ctx) {
-            return _.bind(clipByName, logo)(ctx)
-        }
-    });
-    canvas1.add(logo);
-};
-
-
-
-function findByClipName(name) {
-    return _(canvas.getObjects()).where({
-        clipFor: name
-    }).first()
-}
-
-
-// Since the `angle` property of the Image object is stored 
-// in degrees, we'll use this to convert it to radians.
-function degToRad(degrees) {
-    return degrees * (Math.PI / 180);
-}
-
-
-
-var clipByName = function (ctx) {
-    this.setCoords();
-    var clipRect = findByClipName(this.clipName);
-    var scaleXTo1 = (1 / this.scaleX);
-    var scaleYTo1 = (1 / this.scaleY);
-    ctx.save();
-
-    var ctxLeft = -(this.width / 2) + clipRect.strokeWidth;
-    var ctxTop = -(this.height / 2) + clipRect.strokeWidth;
-    var ctxWidth = clipRect.width - clipRect.strokeWidth;
-    var ctxHeight = clipRect.height - clipRect.strokeWidth;
-
-    ctx.translate(ctxLeft, ctxTop);
-
-    ctx.rotate(degToRad(this.angle * -1));
-    ctx.scale(scaleXTo1, scaleYTo1);
-    ctx.beginPath();
-    ctx.rect(
-        clipRect.left - this.oCoords.tl.x,
-        clipRect.top - this.oCoords.tl.y,
-        clipRect.width,
-        clipRect.height
-    );
-    ctx.closePath();
-    ctx.restore();
-}
-
-
+canvas1.renderAll();
