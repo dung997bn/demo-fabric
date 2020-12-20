@@ -114,7 +114,17 @@ const addSticker = (canvas) => {
 }
 
 const testfunc = (canvas) => {
-    console.log(canvas.size());
+    let obj = canvas.toJSON()
+    let dataObj = obj.objects
+    // dataObj = dataObj.filter(x => x.type === 'group')
+    let objects = { objects: dataObj }
+    console.log(objects);
+    canvasTest.loadFromJSON(objects, () => {
+        // canvasTest.renderAll()
+        canvasTest.requestRenderAll()
+    }, (o, item) => {
+        console.log(item);
+    })
 }
 
 
@@ -229,12 +239,13 @@ const setColorListener = () => {
 }
 
 const clearCanvas = (canvas, state) => {
-    state.val = canvas.toSVG()
-    canvas.getObjects().forEach((obj) => {
-        if (obj !== canvas.backgroundImage) {
-            canvas.remove(obj)
-        }
-    })
+    // state.val = canvas.toSVG()
+    // group.val = canvas.toSVG()
+    // canvas.getObjects().forEach((obj) => {
+    //     if (obj !== canvas.backgroundImage) {
+    //         canvas.remove(obj)
+    //     }
+    // })
 
 }
 const testClick = (canvas) => {
@@ -459,4 +470,4 @@ canvas1.clipPath = new fabric.Rect({
     // originY: 'center',
 }),
 
-canvas1.renderAll();
+    canvas1.renderAll();
